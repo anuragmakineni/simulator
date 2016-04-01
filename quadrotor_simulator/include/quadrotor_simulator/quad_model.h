@@ -17,9 +17,6 @@ namespace gazebo
 {
     class QuadModel : public ModelPlugin
     {
-        public:
-            //QuadModel();
-            //virtual ~QuadModel();
         
         protected:
             void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/);
@@ -27,7 +24,8 @@ namespace gazebo
             void ForceCb(const geometry_msgs::Twist::ConstPtr& msg);
         private:
             void QueueThread();
-                
+            
+            physics::WorldPtr world_;
             physics::ModelPtr model_;
             event::ConnectionPtr updateConnection_;
             physics::LinkPtr link_;
@@ -37,6 +35,7 @@ namespace gazebo
             ros::CallbackQueue rosQueue_;
             std::thread rosQueueThread_;
 
+            math::Vector3 gravity_;
             math::Vector3 forces_;
             math::Vector3 moments_;
             
