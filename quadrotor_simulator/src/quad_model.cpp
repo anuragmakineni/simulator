@@ -75,7 +75,8 @@ namespace gazebo
       
       sensor_msgs::Imu imu;
       imu.header.stamp = ros::Time::now();
-
+      imu.header.frame_id = this->model_->GetName();
+      
       imu.orientation.x = att.x;
       imu.orientation.y = att.y;
       imu.orientation.z = att.z;
