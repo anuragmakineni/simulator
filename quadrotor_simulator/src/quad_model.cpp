@@ -67,9 +67,11 @@ namespace gazebo
       //publish forces and moments to model
       this->link_->AddRelativeForce(this->forces_);
       this->link_->AddRelativeTorque(this->moments_);
-
+      
+      math::Pose pose = this->link_->GetWorldPose();
+      math::Vector3 position = pose.pos;
       //IMU publishing
-      math::Quaternion att = (link_->GetWorldPose()).rot;
+      math::Quaternion att = pose.rot;
       math::Vector3 ang_vel = this->link_->GetRelativeAngularVel();
       math::Vector3 lin_acc = this->link_->GetRelativeLinearAccel() - att.RotateVectorReverse(gravity_);
       
@@ -91,7 +93,13 @@ namespace gazebo
       imu.linear_acceleration.z = lin_acc[2];
 
       imu_pub_.publish(imu);
-    
+      
+      //tf broadcast 
+      tf::Transform transform;
+      transform.setOrigin(tf::Vector3(position[0], position[1], position[2]));
+      transform.setRotation(tf::Quaternion(att.x, att.y, att.z, att.w));
+
+      br_.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", this->model_->GetName()));
     }
 
   // Register this plugin with the simulator

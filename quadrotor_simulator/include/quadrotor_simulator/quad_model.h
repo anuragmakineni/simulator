@@ -9,6 +9,7 @@
 #include <gazebo/common/common.hh>
 
 #include <ros/ros.h>
+#include <tf/transform_broadcaster.h>
 #include <ros/callback_queue.h>
 #include <ros/subscribe_options.h>
 #include <geometry_msgs/Twist.h>
@@ -36,6 +37,7 @@ namespace gazebo
             ros::CallbackQueue rosQueue_;
             std::thread rosQueueThread_;
             ros::Publisher imu_pub_;
+            tf::TransformBroadcaster br_;
 
             math::Vector3 gravity_;
             math::Vector3 forces_;
