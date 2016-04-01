@@ -34,7 +34,10 @@ namespace gazebo
 
       this->rosQueueThread_ =
               std::thread(std::bind(&QuadModel::QueueThread, this));
-       
+
+      //IMU Publisher
+      this->imu_pub_ = this->rosNode_->advertise<sensor_msgs::Imu>("/imu", 1, false);
+
       //initialize vectors for model
       this->gravity_ = this->world_->GetPhysicsEngine()->GetGravity();
       this->forces_ = math::Vector3(0,0,0);
@@ -60,15 +63,34 @@ namespace gazebo
     void QuadModel::OnUpdate(const common::UpdateInfo & /*_info*/)
     {
       this->link_ = this->model_->GetLink();
-      
+
       //publish forces and moments to model
       this->link_->AddRelativeForce(this->forces_);
       this->link_->AddRelativeTorque(this->moments_);
-     
-      //IMU stuff
+
+      //IMU publishing
       math::Quaternion att = (link_->GetWorldPose()).rot;
       math::Vector3 ang_vel = this->link_->GetRelativeAngularVel();
       math::Vector3 lin_acc = this->link_->GetRelativeLinearAccel() - att.RotateVectorReverse(gravity_);
+      
+      sensor_msgs::Imu imu;
+      imu.header.stamp = ros::Time::now();
+
+      imu.orientation.x = att.x;
+      imu.orientation.y = att.y;
+      imu.orientation.z = att.z;
+      imu.orientation.w = att.w;
+
+      imu.angular_velocity.x = ang_vel[0];
+      imu.angular_velocity.y = ang_vel[1];
+      imu.angular_velocity.z = ang_vel[2];
+
+      imu.linear_acceleration.x = lin_acc[0];
+      imu.linear_acceleration.y = lin_acc[1];
+      imu.linear_acceleration.z = lin_acc[2];
+
+      imu_pub_.publish(imu);
+    
     }
 
   // Register this plugin with the simulator

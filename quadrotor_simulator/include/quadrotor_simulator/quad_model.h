@@ -12,6 +12,7 @@
 #include <ros/callback_queue.h>
 #include <ros/subscribe_options.h>
 #include <geometry_msgs/Twist.h>
+#include <sensor_msgs/Imu.h>
 
 namespace gazebo
 {
@@ -34,6 +35,7 @@ namespace gazebo
             ros::Subscriber rosSub_;
             ros::CallbackQueue rosQueue_;
             std::thread rosQueueThread_;
+            ros::Publisher imu_pub_;
 
             math::Vector3 gravity_;
             math::Vector3 forces_;
